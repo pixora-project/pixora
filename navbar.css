@@ -55,13 +55,13 @@ header{
     border: none;
 }
 
-.form-select{
+/* .form-select{
     border: none;
     border-radius: 0%;
     border-bottom: 2px solid var(--special_dark-color);
     background-color: #fcfcfc;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-}
+} */
 
 #ul2 .bi-bell{
     font-size: 18px;

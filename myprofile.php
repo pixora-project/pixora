@@ -31,8 +31,10 @@ include "fetch_my_photos.php";
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="fontawesome/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="bsicons/bsicons/bootstrap-icons.min.css">
+    <!-- <link rel="stylesheet" href="bootstrap/css/bootstrap-select.min.css"> -->
     <link rel="stylesheet" href="sweetalert/sweetalert2.min.css">
-    <script src="Jquery File/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="select2/select2.min.css">
 </head>
 
 <body>
@@ -368,7 +370,13 @@ include "fetch_my_photos.php";
                                                 <p><?= $infos['location'] ?? ".."; ?></p>
                                             </div>
                                             <div class="edit-div">
-                                                <input type="text" class="form-control" name="update_location" id="editLocation" value="<?= $infos['location']; ?>">
+                                                <div class="dropdown">
+                                                    <button type="button" class="form-control text-start" data-bs-toggle="dropdown" id="countryBtn" aria-expanded="false">
+                                                        Select a country
+                                                    </button>
+                                                    <ul class="dropdown-menu" id="countryListe"></ul>
+                                                    <input type="hidden" name="update_location" id="selectedCountry" value="<?= $infos['location'] ?>">
+                                                </div>
                                             </div>
                                         </li>
                                     </ul>
@@ -501,6 +509,24 @@ include "fetch_my_photos.php";
     <script src="edit_informations.js"></script>
     <script src="sweetalert/sweetalert2.min.js"></script>
     <script src="edit_profile.js"></script>
+    <!-- <script src="bootstrap/js/bootstrap-select.min.js"></script> -->
+    <script src="select2/select2.min.js" defer></script>
+    <script src="fetch_countries.js"></script>
+    <script>
+        /* $(document).ready(function() {
+            $('#editLocation').select2({
+                placeholder: "Select a country"
+            });
+
+            $.getJSON('./json/countries.json', function(countries) {
+                countries.forEach(country => {
+                    const option = new Option(country.name,country.id);
+                    $('#editLocation').append(option);
+                });
+                $('#editLocation').trigger('change');
+            });
+        }); */
+    </script>
     <script src="chart.js-4.5.1/package/dist/chart.umd.js"></script>
     <script>
         const ctx = document.getElementById('statisticsChart');

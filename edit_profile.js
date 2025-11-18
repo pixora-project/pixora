@@ -14,7 +14,7 @@ const errname = document.getElementById('err_username');
 const erremail = document.getElementById('err_useremail');
 const errphone = document.getElementById('err_userphone');
 const errdname = document.getElementById('err_dname');
-let ok = false;
+let ok = true;
 
 function checkName() {
     if (namereg.test(username.value)) {
@@ -40,7 +40,7 @@ function checkEmail() {
     }
 }
 
-function checkDname() {
+/* function checkDname() {
     if (dnamereg.test(userdname.value)) {
         errdname.textContent = "Correct";
         errdname.style.color = "green";
@@ -50,9 +50,9 @@ function checkDname() {
         errdname.style.color = "red";
         ok = false;
     }
-}
+} */
 
-function checkPhone() {
+/* function checkPhone() {
     if (phonereg.test(userphone.value)) {
         errphone.textContent = "Correct";
         errphone.style.color = "green";
@@ -62,7 +62,7 @@ function checkPhone() {
         errphone.style.color = "red";
         ok = false;
     }
-}
+} */
 
 const submitButton = document.getElementById('saveChangeBtn');
 submitButton.addEventListener('click', (event) => {
