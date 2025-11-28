@@ -53,8 +53,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     $up_gender -> bindValue(":id",$id,PDO::PARAM_INT);
     $up_gender -> execute();
 
-    $up_location = $conn -> prepare("UPDATE users SET location = :location WHERE id = :id");
-    $up_location -> bindValue(":location",$userlocation,PDO::PARAM_STR);
+    $up_location = $conn -> prepare("UPDATE users SET country = :country WHERE id = :id");
+    $up_location -> bindValue(":country",$userlocation,PDO::PARAM_STR);
     $up_location -> bindValue(":id",$id,PDO::PARAM_INT);
     $up_location -> execute();
 

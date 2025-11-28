@@ -23,13 +23,12 @@ $category->bindValue(":id", $photo['category_id'], PDO::PARAM_INT);
 $category->execute();
 $cat_name = $category->fetch(PDO::FETCH_ASSOC);
 
-/* $stmt = $conn->prepare("SELECT * FROM photos WHERE photo_id = :id LIMIT 1");
-$stmt -> bindValue(":id",$id,PDO::PARAM_INT);
-$stmt->execute();
-$row = $stmt->fetch(PDO::FETCH_ASSOC); */
+$us = $conn->prepare("SELECT * FROM users WHERE token = :tk");
+$us->bindValue(":tk", $_COOKIE['px_user_token'] ?? null, PDO::PARAM_STR);
+$us->execute();
+$usr = $us->fetch(PDO::FETCH_ASSOC);
+$userid = $usr['id'] ?? null;
 
-$userid = intval($_SESSION['px_id'] ?? $_COOKIE['px_userid']);
-/* foreach ($rows as &$row) { */
 if ($userid) {
     $lk = $conn->prepare("SELECT COUNT(*) FROM likes WHERE user_id = :userid AND photo_id = :photoid");
     $lk->bindValue(":userid", $userid, PDO::PARAM_INT);
@@ -43,7 +42,17 @@ $cnt = $conn->prepare("SELECT COUNT(*) FROM likes WHERE photo_id = :photoid");
 $cnt->bindValue(":photoid", $photo['id'], PDO::PARAM_INT);
 $cnt->execute();
 $totalLikes = $cnt->fetchColumn();
-/* } */
+
+$comments = $conn->prepare("SELECT c.id ,c.photo_id, c.user_id, c.content, c.created_at, c.updated_at, u.username
+FROM comments c
+JOIN users u ON c.user_id = u.id
+WHERE c.photo_id = :photo_id
+ORDER BY c.created_at ASC");
+$comments->bindValue(":photo_id", $photo['id'], PDO::PARAM_INT);
+$comments->execute();
+$cs = $comments->fetchAll(PDO::FETCH_ASSOC);
+
+include_once 'convert_date.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,6 +67,9 @@ $totalLikes = $cnt->fetchColumn();
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="bsicons/bsicons/bootstrap-icons.min.css">
     <link rel="stylesheet" href="fontawesome/fontawesome/css/all.min.css">
+    <script src="Jquery File/jquery-3.7.1.min.js"></script>
+    <!-- <script src="NotifyJs/notify.min.js"></script> -->
+    <link rel="stylesheet" href="Notyf/notyf.min.css">
 </head>
 
 <body>
@@ -65,7 +77,8 @@ $totalLikes = $cnt->fetchColumn();
         <div class="alert mt-2 mb-2">
             <?= $_SESSION['photomess']; ?>
             <button type="button" class="btn btn-close" data-bs-dismiss="alert"></button>
-            <?php unset($_SESSION['photomess']); ?>
+            <?php //unset($_SESSION['photomess']); 
+            ?>
         </div>
     <?php endif; ?>
     <?php include "navbar.php"; ?>
@@ -134,11 +147,11 @@ $totalLikes = $cnt->fetchColumn();
                 </li>
                 <li>
                     <i class="fa-solid fa-calendar"></i>
-                    <p><?= $photo['upload_date']; ?></p>
+                    <p><?= timeAgo($photo['upload_date']); ?></p>
                 </li>
                 <li>
                     <i class="fa-solid fa-user"></i>
-                    <p><?= $user['username']; ?></p>
+                    <p><a href="#"><?= $user['username']; ?></a></p>
                 </li>
                 <li>
                     <i class="fa-solid fa-tags"></i>
@@ -167,29 +180,41 @@ $totalLikes = $cnt->fetchColumn();
             </ul>
             <div class="comments">
                 <h5>Comments</h5>
-                <form action="" class="comment-form" method="post">
+                <form action="add_comments.php" class="comment-form" method="post">
                     <div class="input-group">
-                        <textarea id="up_comment" placeholder="Type your comment ..." class="form-control" rows="1" cols="1"></textarea>
-                        <button type="submit" class="btn btn-primary">Post</button>
+                        <textarea id="up_comment" name="comment_content" placeholder="Type your comment ..." class="form-control" rows="1" cols="1"></textarea>
+                        <input type="hidden" name="photo_id" value="<?= $photo['id']; ?>">
+                        <button type="submit" class="btn btn-primary disabled" id="postBtn">Post</button>
                     </div>
                 </form>
-                <ul class="comments-list mt-4">
-                    <li class="comment-item">
-                        <img src="outils/pngs/useracc2.png" alt="user" class="comment-avatar">
-                        <div class="comment-body">
-                            <h6 class="comment-author">User</h6>
-                            <p class="comment-text">Somthing :)</p>
-                            <span class="comment-date">2025-05-22</span>
-                        </div>
-                    </li>
-                </ul>
+                <?php include "comments.php"; ?>
             </div>
         </div>
     </div>
-
     <script src="likes.js"></script>
     <script src="rotate_icon.js"></script>
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="Notyf/notyf.min.js"></script>
+    <script src="notyf.js"></script>
+    <script>
+        document.getElementById('up_comment').addEventListener('input', () => {
+            if (document.getElementById('up_comment').value.trim() === "") {
+                document.getElementById('postBtn').classList.add('disabled');
+            } else {
+                document.getElementById('postBtn').classList.remove('disabled');
+            }
+        });
+    </script>
+    <?php if (!empty($_SESSION['commentMess']) && is_array($_SESSION['commentMess'])): ?>
+        <?php foreach ($_SESSION['commentMess'] as $n): ?>
+            <script>
+                notyf[<?= json_encode($n['type']); ?>](<?= json_encode($n['message']); ?>);
+            </script>
+        <?php endforeach; ?>
+        <?php unset($_SESSION['commentMess']); 
+        ?>
+    <?php endif; ?>
+
 </body>
 
 </html>

@@ -11,12 +11,12 @@ $stm = $conn->prepare("SELECT * FROM users");
 $stm->execute();
 $users = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-$id = intval($_SESSION['px_id'] ?? $_COOKIE['px_userid'] ?? null);
+$userid = intval($_SESSION['px_id'] ?? $_COOKIE['px_userid'] ?? null);
 
 foreach ($rows as &$row) {
-    if (!empty($id)) {
+    if (!empty($userid)) {
         $lk = $conn->prepare("SELECT COUNT(*) FROM likes WHERE user_id = :userid AND photo_id = :photoid");
-        $lk->bindValue(":userid", $id, PDO::PARAM_INT);
+        $lk->bindValue(":userid", $userid, PDO::PARAM_INT);
         $lk->bindValue(":photoid", $row['id'], PDO::PARAM_INT);
         $lk->execute();
         $row['isLiked'] = $lk->fetchColumn() > 0;
@@ -96,42 +96,43 @@ foreach ($rows as &$row) {
             </ul>
         </nav>
     </div>
-    <div class="modal fade" id="comments" aria-hidden="true" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1>Comments</h1>
-                </div>
-                <div class="modal-body">
-                    <form action="" class="comment-form" method="post">
-                        <div class="input-group">
-                            <textarea id="up_comment" placeholder="Type your comment ..." class="form-control" rows="1" cols="1"></textarea>
-                            <button type="submit" class="btn btn-primary">Post</button>
-                        </div>
-                    </form>
-                    <ul class="comments-list mt-4">
-                        <h4>All comments</h4>
-                        <li class="comment-item">
-                            <img src="outils/pngs/useracc2.png" alt="user" class="comment-avatar">
-                            <div class="comment-body">
-                                <h6 class="comment-author">User</h6>
-                                <p class="comment-text">Somthing :)</p>
-                                <span class="comment-date">2025-05-22</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="tab-content">
         <div class="container-fluid tab-pane fade show active mt-3 mb-3" id="foryou">
             <h1 class="text-center fw-bold">For you</h1>
             <div class="photos">
                 <?php foreach ($rows as &$row): ?>
+                    <div class="modal fade" id="comments-<?= $row['id']; ?>" aria-hidden="true" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="fw-bold">Comments</h1>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="add_comments.php" class="comment-form" method="post">
+                                        <input type="hidden" name="photo_id" value="<?= $row['id']; ?>">
+                                        <div class="input-group">
+                                            <textarea id="up_comment" name="comment_content" placeholder="Type your comment ..." class="form-control" rows="1" cols="1"></textarea>
+                                            <button type="submit" class="btn btn-primary">Post</button>
+                                        </div>
+                                    </form>
+                                    <hr>
+                                    <div class="mt-3">
+                                        <h4 class="fw-bold">All comments</h4>
+                                        <?php
+                                        $comments = $conn->prepare("SELECT c.id, c.photo_id, c.user_id, c.content, c.created_at, c.updated_at, u.username FROM comments c JOIN users u ON c.user_id = u.id WHERE c.photo_id = :photo_id ORDER BY c.created_at ASC");
+                                        $comments -> bindValue(":photo_id",$row['id'],PDO::PARAM_INT);
+                                        $comments -> execute();
+                                        $cs = $comments -> fetchAll(PDO::FETCH_ASSOC);
+                                        ?>
+                                        <?php include "comments.php"; ?>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card">
                         <a id="caption" href="photo_preview.php?id=<?= $row['id']; ?>">
                             <div class="photo">
@@ -144,43 +145,13 @@ foreach ($rows as &$row) {
                                         <input type="hidden" name="photo_id" value="<?= $row['id']; ?>">
                                         <a href="#" class="likeButton <?= $row['isLiked'] ? 'active' : '' ?>" data-photo-id="<?= $row['id']; ?>">
                                             <i class="fas fa-heart"></i>
-
                                             <span id="likes_count-<?= $row['id']; ?>"><?= $row['totalLikes']; ?></span>
                                         </a>
-                                        <a href="#" data-bs-target="#comments" data-bs-toggle="modal"><i class="fas fa-comment"></i></a>
+                                        <a href="#" data-bs-target="#comments-<?= $row['id']; ?>" data-bs-toggle="modal"><i class="fas fa-comment"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </a>
-                        <!-- <div class="card-body socialActions">
-                            <div>
-                                <a href="#"></i>
-                                    <?php foreach ($users as $user): ?>
-                                        <?php if ($row['user_id'] === $user['id']) echo $user['username']; ?>
-                                    <?php endforeach; ?>
-                                </a>
-                            </div>
-                            <div>
-                                <input type="hidden" name="photo_id" value="<?= $row['id']; ?>">
-                                <a href="#" class="likeButton <?= $row['isLiked'] ? 'active' : '' ?>" data-photo-id="<?= $row['id']; ?>">
-                                    <i class="fas fa-heart"></i>
-
-                                    <span id="likes_count-<?= $row['id']; ?>"><?= $row['totalLikes']; ?></span>
-                                </a>
-                                <a href="#"><i class="fas fa-comment"></i></a>
-                            </div>
-                            <!-- <div>
-                                <a href="#" data-bs-toggle="dropdown" data-bs-target="#drp1"><i class="fas fa-ellipsis-v"></i></a>
-                                <div>
-                                    <div class="dropdown" id="drp1">
-                                        <ul class="dropdown-menu">
-                                            <li><a href="#" class="dropdown-item"><i class="fas fa-file-lines"></i> Details</a></li>
-                                            <li><a href="#" class="dropdown-item"><i class="fas fa-download"></i> Download</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -298,10 +269,10 @@ foreach ($rows as &$row) {
             </div>
             <div class="container-fluid div3">
                 <?php foreach ($users as &$user): ?>
-                    <?php if ($user['id'] == $id) continue; ?>
+                    <?php if ($user['id'] == $userid) continue; ?>
                     <?php
                     $addFol = $conn->prepare("SELECT 1 FROM follows WHERE follower_id = :me AND following_id = :id");
-                    $addFol->bindValue(":me", $id, PDO::PARAM_INT);
+                    $addFol->bindValue(":me", $userid, PDO::PARAM_INT);
                     $addFol->bindValue(":id", $user['id'], PDO::PARAM_INT);
                     $addFol->execute();
                     $isFollowing = $addFol->rowCount() > 0;

@@ -19,11 +19,6 @@ $stmt->bindValue(":id", $id, PDO::PARAM_INT);
 $stmt->execute();
 $photo = $stmt->fetch();
 
-$stm0 = $conn->prepare("SELECT DATE(upload_date) AS only_date FROM photos WHERE id = :id");
-$stm0->bindValue(":id", $id, PDO::PARAM_INT);
-$stm0->execute();
-$data = $stm0->fetch(PDO::FETCH_ASSOC);
-
 if (!$photo) {
     die("Photo not found.");
 }
@@ -54,6 +49,17 @@ $cnt = $conn->prepare("SELECT COUNT(*) FROM likes WHERE photo_id = :photoid");
 $cnt->bindValue(":photoid", $photo['id'], PDO::PARAM_INT);
 $cnt->execute();
 $totalLikes = $cnt->fetchColumn();
+
+$comments = $conn->prepare("SELECT c.id ,c.photo_id, c.user_id, c.content, c.created_at, c.updated_at, u.username
+FROM comments c
+JOIN users u ON c.user_id = u.id
+WHERE c.photo_id = :photo_id
+ORDER BY c.created_at ASC");
+$comments->bindValue(":photo_id", $photo['id'], PDO::PARAM_INT);
+$comments->execute();
+$cs = $comments->fetchAll(PDO::FETCH_ASSOC);
+
+include_once 'convert_date.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,6 +77,7 @@ $totalLikes = $cnt->fetchColumn();
     <link rel="stylesheet" href="bootstrap/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="sweetalert/sweetalert2.min.css">
     <script src="Jquery File/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="Notyf/notyf.min.css">
 </head>
 
 <body>
@@ -115,16 +122,16 @@ $totalLikes = $cnt->fetchColumn();
                     </li>
                     <li>
                         <i class="fa-solid fa-calendar"></i>
-                        <p><?= $data['only_date']; ?></p>
+                        <p><?= timeAgo($photo['upload_date']); ?></p>
                     </li>
                     <li>
                         <i class="fa-solid fa-user"></i>
-                        <p><?= $user['username']; ?></p>
+                        <p><a href="#"><?= $user['username']; ?></a></p>
                     </li>
                     <li>
                         <i class="fa-solid fa-tags"></i>
                         <div class="display_div">
-                            <p><?= $cat_name['name'] ?? "Null"; ?></p>
+                            <p><?= $cat_name['name'] ?? ""; ?></p>
                         </div>
                         <div class="edit_div">
                             <textarea name="update_category" id="Category" data-bs-toggle="tooltip" title="Edit category" class="form-control" rows="1"><?= $cat_name['name'] ?? ""; ?></textarea>
@@ -182,16 +189,7 @@ $totalLikes = $cnt->fetchColumn();
             </ul>
             <div class="comments">
                 <h5>Comments</h5>
-                <ul class="comments-list mt-4">
-                    <li class="comment-item">
-                        <img src="outils/pngs/useracc2.png" alt="user" class="comment-avatar">
-                        <div class="comment-body">
-                            <h6 class="comment-author">User</h6>
-                            <p class="comment-text">Somthing :)</p>
-                            <span class="comment-date">2025-05-22</span>
-                        </div>
-                    </li>
-                </ul>
+                <?php include 'comments.php'; ?>
             </div>
         </div>
     </div>
@@ -203,6 +201,7 @@ $totalLikes = $cnt->fetchColumn();
     <script src="sweetalert/sweetalert2.min.js"></script>
     <script src="confirm-alert.js"></script>
     <script src="tooltip.js"></script>
+    <script src="Notyf/notyf.min.js"></script>
     <script>
         const edit_button = document.getElementById('editBtn');
         const saveChanges = document.getElementById('saveChangeBtn');

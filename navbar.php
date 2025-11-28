@@ -5,7 +5,7 @@
                 <li class="nav-item" title="Welcome to Picora">
                     <a style="cursor: pointer;" onclick="return location.reload();"
                         class="nav-link nav-brand p-0 m-0">
-                        <img src="outils/pngs/dark_logo.png" style="padding: 0%;width: 100px;;height: auto;margin: 0;"
+                        <img src="outils/pngs/logo_styled.png" style="padding: 0%;width: 100px;;height: auto;margin: 0;"
                             id="logo">
                     </a>
                 </li>
@@ -104,7 +104,7 @@
     </button>
     <div class="offcanvas offcanvas-end d-md-flex" tabindex="-1" id="offcanvasDg" aria-labelledby="offcanvasDg">
         <div class="offcanvas-header d-flex justify-content-between">
-            <img src="outils/pngs/dark_logo.png" alt="logo" width="100px" height="auto"
+            <img src="outils/pngs/logo_styled.png" alt="logo" width="100px" height="auto"
                 title="Welcome to DeluxeUpload" id="logo">
             <img src="outils/pngs/useracc.png" alt="logo" width="40px" height="auto" id="imgAcc"
                 title="My Account" onclick="window.open('dasheboard.php','_self')">

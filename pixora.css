@@ -888,3 +888,18 @@ footer{
     color: #888;
     font-size: 12px;
 }
+
+.comment-author small{
+    margin-left: 10px;
+    color: #444;
+    font-weight: lighter;
+}
+
+.deleteComment, .reportComment,.copyComment,.editComment{
+    transition: none;
+}
+
+.deleteComment:hover,.reportComment:hover{
+    background-color: #ED3D3D;
+    color: white;
+}
