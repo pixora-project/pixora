@@ -196,15 +196,7 @@ include_once 'convert_date.php';
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="Notyf/notyf.min.js"></script>
     <script src="notyf.js"></script>
-    <script>
-        document.getElementById('up_comment').addEventListener('input', () => {
-            if (document.getElementById('up_comment').value.trim() === "") {
-                document.getElementById('postBtn').classList.add('disabled');
-            } else {
-                document.getElementById('postBtn').classList.remove('disabled');
-            }
-        });
-    </script>
+    <script src="comment_button_action.js"></script>
     <?php if (!empty($_SESSION['commentMess']) && is_array($_SESSION['commentMess'])): ?>
         <?php foreach ($_SESSION['commentMess'] as $n): ?>
             <script>

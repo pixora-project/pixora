@@ -15,6 +15,8 @@ $info->bindValue(":id", $id, PDO::PARAM_INT);
 $info->execute();
 $infos = $info->fetch();
 
+$pPicture = basename($infos['photo_profile']);
+
 include "statistics_profile.php";
 include "fetch_my_photos.php";
 ?>
@@ -33,8 +35,11 @@ include "fetch_my_photos.php";
     <link rel="stylesheet" href="bsicons/bsicons/bootstrap-icons.min.css">
     <!-- <link rel="stylesheet" href="bootstrap/css/bootstrap-select.min.css"> -->
     <link rel="stylesheet" href="sweetalert/sweetalert2.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="Choices js/choices.min.css">
+    <script src="Jquery File/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="select2/select2.min.css">
+    <link rel="stylesheet" href="LightGallery/lightgallery.min.css">
+    <link rel="stylesheet" href="LightGallery/lightgallery-bundle.css">
 </head>
 
 <body>
@@ -66,92 +71,62 @@ include "fetch_my_photos.php";
         </div>
         <?php unset($_SESSION['edit_profile']); ?>
     <?php endif; ?>
+    <div class="modal fade" id="profileSettings" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div>
+                        <ul class="list-group profile_settings">
+                            <li class="list-group-item"><a href="#" onclick="document.getElementById('profile_img').click();"><i class="fas fa-upload"></i> Upload profile picture</a></li>
+                            <li class="list-group-item"><a href="#" onclick="previewProfilePicture();"><i class="fas fa-eye"></i> Preview profile picture</a></li>
+                            <li class="list-group-item deleteOption">
+                                <form action="delete_profile_picture.php" id="delPhotoProfileForm" method="post">
+                                    <a href="#" onclick="delProfilePhoto()"><i class="fas fa-trash"></i> Delete profile picture</a>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="coverSettings" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div>
+                        <ul class="list-group profile_settings">
+                            <li class="list-group-item"><a href="#" onclick="document.getElementById('cover_file').click();"><i class="fas fa-upload"></i> Upload cover picture</a></li>
+                            <li class="list-group-item"><a href="#" onclick="previewCoverPicture();"><i class="fas fa-eye"></i> Preview cover picture</a></li>
+                            <li class="list-group-item deleteOption">
+                                <form action="delete_cover_picture.php" id="delPhotoCoverForm" method="post">
+                                    <a href="#" onclick="delCoverPhoto()"><i class="fas fa-trash"></i> Delete cover picture</a>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php if (!empty($pPicture)): ?>
+        <div class="profilePreview" style="display: none;">
+            <a href="profile_pictures/<?= $pPicture; ?>">
+                <img src="profile_pictures/<?= $pPicture; ?>">
+            </a>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($infos['cover_image'])): ?>
+        <div class="coverPreview" style="display: none;">
+            <a href="cover_images/<?= $infos['cover_image']; ?>">
+                <img src="cover_images/<?= $infos['cover_image']; ?>">
+            </a>
+        </div>
+    <?php endif; ?>
     <main>
         <?php include "navbar.php"; ?>
-        <div class="modal fade" id="bio" aria-hidden="true" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1>Add bio</h1>
-                    </div>
-                    <div class="modal-body">
-                        <form action="add_bio.php?id=<?= $infos['id']; ?>" method="post">
-                            <label for="bio" class="form-label">Bio</label>
-                            <textarea name="bioProfil" id="bio" class="form-control"><?= $infos['bio']; ?></textarea>
-                            <button type="submit" class="btn mt-2 mb-2" id="addBio">Add bio</button>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="lang" aria-hidden="true" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1>Site Language</h1>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <label for="language" class="form-label">Language</label>
-                            <select name="lang" id="language" class="form-select">
-                                <option value="English">English</option>
-                                <option value="Arabic">Arabic</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="up_name" aria-hidden="true" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1>Edit username</h1>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <label for="editName" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="editName" value="<?= $infos['username']; ?>">
-                            <button type="button" class="btn mt-2 mb-2" id="update_name">Update name</button>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="up_location" aria-hidden="true" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1>Edit location</h1>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <label for="editLocation" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="editLocation" value="<?= $infos['location']; ?>">
-                            <button type="button" class="btn mt-2 mb-2" id="update_location">Update location</button>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="container-fluid">
             <div class="row div">
-                <!-- <button type="button" class="btn d-md-none" data-bs-toggle="collapse" data-bs-target="#demo" id="collapseButton"><i class="fas fa-bars"></i></button> -->
                 <nav class="navbar navbar-expand nav2 sticky-top" id="demo">
                     <div class="mx-auto">
                         <ul class="nav">
@@ -164,20 +139,25 @@ include "fetch_my_photos.php";
                 </nav>
                 <div class="tab-content">
                     <div class="mt-2 mb-2 tab-pane fade show active" id="info">
-                        <!-- <a href="#">
-                        <h2><i class="fas fa-user-circle"></i> <u><?= $infos['username']; ?></u></h2>
-                    </a> -->
                         <div class="d-flex justify-content-start align-items-center mt-2 mb-3" style="flex-direction: column;gap:5px;">
                             <div class="container-fluid p-0 profileImages">
-                                <div class="coverImage">
+                                <div class="coverImage" style="
+<?php if (!empty($infos['cover_image'])): ?>
+background:url('cover_images/<?= $infos['cover_image'] ?>') fixed no-repeat;
+<?php endif; ?>
+">
                                     <div class="d-flex justify-content-center">
-                                        <input type="file" class="d-none" name="coverFile" id="cover_file" accept=".jpg, .png, .jpeg">
+                                        <form action="up_cover_picture.php" id="coverPictureForm" method="post" enctype="multipart/form-data">
+                                            <input type="file" class="d-none" name="coverFile" id="cover_file" accept=".png, .jpeg">
+                                        </form>
                                         <i class="fas fa-camera" id="importCover"></i>
                                     </div>
                                 </div>
                                 <div class="profileImage">
-                                    <input type="file" class="d-none" name="profileImage" id="profile_img" accept=".png, .jpg">
-                                    <img src="outils/pngs/useracc2.png" width="100px" class="img_acc" id="imgAcc" alt="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>" title="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>">
+                                    <form action="up_profile_picture.php" id="profilePictureForm" method="post" enctype="multipart/form-data">
+                                        <input type="file" name="profileImage" class="d-none" id="profile_img" accept=".png, .jpeg">
+                                    </form>
+                                    <img src="<?= !empty($pPicture) ? 'profile_pictures/' . htmlspecialchars($pPicture) : 'outils/pngs/useracc2.png' ?>" width="100px" class="img_acc" id="imgAcc" alt="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>" title="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>">
                                 </div>
                             </div>
                         </div>
@@ -187,7 +167,7 @@ include "fetch_my_photos.php";
                                     <h3 class="fw-semibold mb-1"><?= $infos['display_name']; ?></h3>
                                 </div>
                                 <div>
-                                    <p class="mb-1" style="text-decoration: underline;" data-bs-toggle="tooltip" title="View in map"><i id="location_icon" class="fas fa-location-dot"></i> <?= $infos['country'] ?? ""; ?></p>
+                                    <p class="mb-1 mx-auto" style="text-decoration: underline;width:max-content;cursor:pointer;" data-bs-toggle="tooltip" title="View in map"><i id="location_icon" class="fas fa-location-dot"></i> <?= $infos['country'] ?? ""; ?></p>
                                 </div>
                                 <div>
                                     <p class="mb-1">@<?= $infos['username']; ?></p>
@@ -274,7 +254,7 @@ include "fetch_my_photos.php";
                         <div class="card-info">
                             <div class="mt-5 mx-auto">
                                 <input type="file" class="d-none" name="profileImage" id="profile_img" accept=".png, .jpg">
-                                <img src="outils/pngs/useracc2.png" width="100px" class="img_acc mt-2 mb-2" id="imgAcc" alt="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>" data-bs-toggle="tooltip" title="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>">
+                                <img src="<?= !empty($pPicture) ? "profile_pictures/" . htmlspecialchars($pPicture) : "outils/pngs/useracc2.png" ?> ?>" width="100px" class="img_acc mt-2 mb-2" id="imgAcc1" alt="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>" data-bs-toggle="tooltip" title="<?= $_SESSION['px_name'] ?? $_COOKIE['px_username']; ?>">
                                 <div class="d-flex justify-content-center align-items-center gap-3 text-center profile_actions mx-auto">
                                     <a href="#">
                                         <i class="fas fa-pencil"></i>
@@ -370,11 +350,8 @@ include "fetch_my_photos.php";
                                                 <p><?= $infos['country'] ?? ".."; ?></p>
                                             </div>
                                             <div class="edit-div">
-                                                <div class="dropdown">
-                                                    <button type="button" class="form-control text-start" data-bs-toggle="dropdown" id="countryBtn" aria-expanded="false">
-                                                        Select a country
-                                                    </button>
-                                                    <ul class="dropdown-menu" id="countryListe"></ul>
+                                                <div>
+                                                    <select class="form-control" id="countrySelect"></select>
                                                     <input type="hidden" name="update_location" id="selectedCountry" value="<?= $infos['country'] ?>">
                                                 </div>
                                             </div>
@@ -491,17 +468,6 @@ include "fetch_my_photos.php";
 
 
 
-    <script>
-        const inp = document.getElementById('importCover');
-        inp.addEventListener('click', function() {
-            document.getElementById('cover_file').click();
-        });
-
-        const inp1 = document.querySelector('.img_acc');
-        inp1.addEventListener('click', function() {
-            document.getElementById('profile_img').click();
-        });
-    </script>
     <script src="rotate_icon.js"></script>
     <script src="copyright.js"></script>
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -509,23 +475,196 @@ include "fetch_my_photos.php";
     <script src="edit_informations.js"></script>
     <script src="sweetalert/sweetalert2.min.js"></script>
     <script src="edit_profile.js"></script>
-    <!-- <script src="bootstrap/js/bootstrap-select.min.js"></script> -->
-    <script src="select2/select2.min.js" defer></script>
-    <script src="fetch_countries.js"></script>
+    <script src="Choices js/choices.min.js"></script>
+    <script src="select2/select2.min.js"></script>
     <script>
-        /* $(document).ready(function() {
-            $('#editLocation').select2({
-                placeholder: "Select a country"
-            });
+        const profileModal = document.getElementById('profileSettings');
+        const model = new bootstrap.Modal(profileModal);
+        const coverModal = document.getElementById('coverSettings');
+        const cover_modal = new bootstrap.Modal(coverModal);
+        const inp = document.getElementById('importCover');
+        inp.addEventListener('click', function() {
+            <?php if (empty($infos['cover_image'])): ?>
+                document.getElementById('cover_file').click();
+            <?php else: ?>
+                cover_modal.show();
+            <?php endif; ?>
+        });
 
-            $.getJSON('./json/countries.json', function(countries) {
-                countries.forEach(country => {
-                    const option = new Option(country.name,country.id);
-                    $('#editLocation').append(option);
+        const inp1 = document.querySelector('.img_acc');
+        inp1.addEventListener('click', function() {
+            <?php if (empty($pPicture)): ?>
+                document.getElementById('profile_img').click();
+            <?php else: ?>
+                model.show();
+            <?php endif; ?>
+        });
+    </script>
+    <script>
+        const form = document.getElementById('profilePictureForm');
+        const input = document.getElementById('profile_img');
+        input.addEventListener('change', (e) => {
+            const file = input.files[0];
+            if (!file) {
+                Swal.fire(
+                    'Error',
+                    'Please select a file first',
+                    'error'
+                );
+                return;
+            }
+
+            let maxSize = 10 * 10 * 1024;
+            if (file.size > maxSize) {
+                Swal.fire(
+                    'Error',
+                    'File too large !',
+                    'error'
+                );
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                Swal.fire({
+                    title: 'Are you sure ?',
+                    html: `
+                    <img src="${e.target.result}" style="width:400px;border-radius:10px;" class="img-fluid">
+                    <p class='mt-2'>Please confirm your selection before uploading.</p>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes , upload it',
+                    confirmButtonColor: 'rgb(0, 120, 255)',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    } else {
+                        input.value = "";
+                    }
                 });
-                $('#editLocation').trigger('change');
+            }
+            reader.readAsDataURL(file);
+
+        });
+
+        function delProfilePhoto() {
+            Swal.fire({
+                title: "Are you sure ?",
+                icon: "question",
+                text: "Are you sure for delete your cover picture ?",
+                showCancelButton: true,
+                confirmButtonText: 'Yes , delete it',
+                confirmButtonColor: '#d93025',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delPhotoProfileForm').submit();
+                }
             });
-        }); */
+        }
+
+        function delCoverPhoto() {
+            Swal.fire({
+                title: "Are you sure ?",
+                icon: "question",
+                text: "Are you sure for delete your cover picture ?",
+                showCancelButton: true,
+                confirmButtonText: 'Yes , delete it',
+                confirmButtonColor: '#d93025',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delPhotoCoverForm').submit();
+                }
+            })
+        }
+
+        const coverForm = document.getElementById('coverPictureForm');
+        const coverInput = document.getElementById('cover_file');
+        coverInput.addEventListener('change', (e) => {
+            const cover_file = coverInput.files[0];
+            if (!cover_file) {
+                Swal.fire(
+                    'Error',
+                    'Please select a file first',
+                    'error'
+                );
+                return;
+            }
+
+            let maxSize = 10 * 1024 * 1024;
+            if (cover_file.size > maxSize) {
+                Swal.fire(
+                    'Error',
+                    'File too large !',
+                    'error'
+                );
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                Swal.fire({
+                    title: 'Are you sure ?',
+                    html: `
+                    <img src="${e.target.result}" style="width:400px;border-radius:10px;" class="img-fluid">
+                    <p class='mt-2'>Please confirm your selection before uploading.</p>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes , upload it',
+                    confirmButtonColor: 'rgb(0, 120, 255)',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        coverForm.submit();
+                    } else {
+                        coverInput.value = "";
+                    }
+                });
+            }
+            reader.readAsDataURL(cover_file);
+
+        });
+    </script>
+    <script src="fetch_countries.js"></script>
+    <script src="LightGallery/lightgallery.min.js"></script>
+    <!-- <script src="LightGallery/lg-zoom.min.js"></script>
+    <script src="LightGallery/lg-thumbnail.min.js"></script> -->
+    <script src="LightGallery/lg-zoom.umd.js"></script>
+    <script src="LightGallery/lg-thumbnail.umd.js"></script>
+    <script>
+        const profilePreviewGallery = document.querySelector('.profilePreview');
+        const coverPreviewGallery = document.querySelector('.coverPreview');
+        lightGallery(profilePreviewGallery, {
+            plugins: [lgZoom, lgThumbnail],
+            speed: 300,
+            download: false,
+            mode: 'lg-fade',
+            zoom: true,
+            thumbnail: true,
+            dragToClose: true,
+            drag: true
+        });
+        lightGallery(coverPreviewGallery, {
+            plugins: [lgZoom, lgThumbnail],
+            speed: 300,
+            download: false,
+            mode: 'lg-fade',
+            zoom: true,
+            thumbnail: true,
+            dragToClose: true
+        });
+
+        function previewProfilePicture() {
+            profilePreviewGallery.querySelector('a').click();
+        }
+
+        function previewCoverPicture() {
+            coverPreviewGallery.querySelector('a').click();
+        }
     </script>
     <script src="chart.js-4.5.1/package/dist/chart.umd.js"></script>
     <script>

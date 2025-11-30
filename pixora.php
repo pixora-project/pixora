@@ -43,7 +43,6 @@ foreach ($rows as &$row) {
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="fontawesome/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="bsicons/bsicons/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="RemixIcon-master/RemixIcon-master/fonts/remixicon.css">
 </head>
 
 <body>
@@ -112,7 +111,7 @@ foreach ($rows as &$row) {
                                         <input type="hidden" name="photo_id" value="<?= $row['id']; ?>">
                                         <div class="input-group">
                                             <textarea id="up_comment" name="comment_content" placeholder="Type your comment ..." class="form-control" rows="1" cols="1"></textarea>
-                                            <button type="submit" class="btn btn-primary">Post</button>
+                                            <button type="submit" class="btn btn-primary disabled" id="postBtn">Post</button>
                                         </div>
                                     </form>
                                     <hr>
@@ -326,6 +325,7 @@ foreach ($rows as &$row) {
     <script src="follows.js" defer></script>
     <script src="quotes.js" defer></script>
     <script src="copyright.js"></script>
+    <script src="comment_button_action.js"></script>
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 

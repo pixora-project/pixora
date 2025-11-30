@@ -83,7 +83,7 @@ header {
     font-weight: 700;
 }
 */
-#imgAcc {
+#imgAcc,#imgAcc1 {
     border: 1px solid black;
     border-radius: 50px;
 }
@@ -851,6 +851,40 @@ a {
 .statisticsGraph:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     transform: translateY(-3px);
+}
+
+.profile_settings{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 18px;
+}
+
+.profile_settings .list-group-item a{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color:#454545;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.profile_settings .list-group-item i{
+    font-size: 20px;
+    color: var(--special_color);
+}
+
+.profile_settings .list-group-item a:hover{
+    color: var(--special_color);
+}
+
+.profile_settings .deleteOption i{
+    color: #d93025;
+}
+
+.profile_settings .deleteOption a:hover{
+    color: #d93025;
 }
 
 @media only screen and (max-width:768px) {

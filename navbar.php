@@ -63,8 +63,15 @@
                 <li class="nav-item" id="upload_button"><a href="upload.php" class="nav-link"
                         title="Upload your photo"><i class="fas fa-arrow-up"></i> upload</a></li>
                 <?php if (isset($_SESSION['px_id']) || isset($_COOKIE['px_userid'])): ?>
+                    <?php
+                        $stm = $conn -> prepare("SELECT * FROM users WHERE id = :id");
+                        $stm -> bindValue(":id",$_SESSION['px_id'] ?? $_COOKIE['px_userid'],PDO::PARAM_INT);
+                        $stm -> execute();
+                        $user = $stm -> fetch(PDO::FETCH_ASSOC);
+                        $img = basename($user['photo_profile']);
+                    ?>
                     <div>
-                        <img src="outils/pngs/useracc2.png" width="40px" height="auto" alt="" id="imgAcc"
+                        <img src="<?= !empty($img) ? 'profile_pictures/'.htmlspecialchars($img) : "outils/pngs/useracc2.png"; ?>" width="40px" height="auto" alt="" id="imgAcc"
                             title="My profil" onclick="window.open('myprofile.php','_self');">
                     </div>
                 <?php else: ?>
